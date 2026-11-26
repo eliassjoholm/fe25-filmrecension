@@ -173,42 +173,37 @@ Every error has the same shape: `{ "error": "message" }`.
 
 ## Database and ER diagram
 
-```mermaid
-erDiagram
-    users  ||--o{ reviews   : "writes"
-    movies ||--o{ reviews   : "gets"
-    users  ||--o{ watchlist : "saves"
-    movies ||--o{ watchlist : "is saved in"
+Entities are boxes, relationships are diamonds, and the numbers on the lines show the cardinality (1 to N).
 
-    users {
-        int id PK
-        varchar email "UNIQUE"
-        char password_hash "bcrypt"
-        datetime created_at
-    }
-    movies {
-        int id PK
-        varchar title
-        varchar director
-        varchar genre
-        smallint release_year
-    }
-    reviews {
-        int id PK
-        int user_id FK
-        int movie_id FK
-        tinyint rating "CHECK 1-10"
-        varchar comment
-        datetime created_at
-        datetime updated_at
-    }
-    watchlist {
-        int id PK
-        int user_id FK
-        int movie_id FK
-        datetime added_at
-    }
+```mermaid
+flowchart LR
+    U["<b>USERS</b><br/>🔑 id<br/>✉️ email · unique<br/>🔒 password_hash<br/>created_at"]
+    M["<b>MOVIES</b><br/>🔑 id<br/>title<br/>director<br/>genre<br/>release_year"]
+    R["<b>REVIEWS</b><br/>🔑 id<br/>🔗 user_id<br/>🔗 movie_id<br/>⭐ rating · 1–10<br/>comment<br/>created_at · updated_at"]
+    W["<b>WATCHLIST</b><br/>🔑 id<br/>🔗 user_id<br/>🔗 movie_id<br/>added_at"]
+
+    writes{"writes"}
+    about{"is about"}
+    saves{"saves"}
+    points{"points to"}
+
+    U ---|1| writes ---|N| R
+    R ---|N| about ---|1| M
+    U ---|1| saves ---|N| W
+    W ---|N| points ---|1| M
+
+    classDef entity fill:#e7f5ff,stroke:#1c7ed6,stroke-width:2px,color:#0b2e4f
+    classDef relation fill:#fff3bf,stroke:#f08c00,stroke-width:2px,color:#5c3c00
+    class U,M,R,W entity
+    class writes,about,saves,points relation
 ```
+
+| Symbol | Meaning |
+|---|---|
+| 🔑 | Primary key |
+| 🔗 | Foreign key (points to `users.id` or `movies.id`) |
+| `1 ── N` | One row on the left can have many rows on the right |
+| unique pair | `reviews (user_id, movie_id)` and `watchlist (user_id, movie_id)` |
 
 - **users → reviews / watchlist:** one user can have many reviews and many saved movies.
 - **movies → reviews / watchlist:** one movie can have many reviews and be saved by many users.
