@@ -4,6 +4,8 @@ const express = require('express');
 const authRoutes = require('./routes/authRoutes');
 const movieRoutes = require('./routes/movieRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const watchlistRoutes = require('./routes/watchlistRoutes');
+const authenticate = require('./middleware/authenticate');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 
 // Stop right away with a clear message instead of failing on the first login
@@ -19,6 +21,7 @@ app.use(express.json({ limit: '10kb' }));
 app.use('/api/auth', authRoutes);
 app.use('/api/movies', movieRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/watchlist', authenticate, watchlistRoutes); // every watchlist route needs a login
 
 app.use(notFound);
 app.use(errorHandler);
