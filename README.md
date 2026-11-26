@@ -173,7 +173,7 @@ Every error has the same shape: `{ "error": "message" }`.
 
 ## Database and ER diagram
 
-Entities are boxes, relationships are diamonds, and the numbers on the lines show the cardinality (1 to N).
+Entities are boxes, relationships are diamonds, and each diamond shows the cardinality (1 : N = one to many).
 
 ```mermaid
 flowchart LR
@@ -182,15 +182,15 @@ flowchart LR
     R["<b>REVIEWS</b><br/>🔑 id<br/>🔗 user_id<br/>🔗 movie_id<br/>⭐ rating · 1–10<br/>comment<br/>created_at · updated_at"]
     W["<b>WATCHLIST</b><br/>🔑 id<br/>🔗 user_id<br/>🔗 movie_id<br/>added_at"]
 
-    writes{"writes"}
-    about{"is about"}
-    saves{"saves"}
-    points{"points to"}
+    writes{"writes<br/><b>1 : N</b>"}
+    about{"is about<br/><b>N : 1</b>"}
+    saves{"saves<br/><b>1 : N</b>"}
+    points{"points to<br/><b>N : 1</b>"}
 
-    U ---|1| writes ---|N| R
-    R ---|N| about ---|1| M
-    U ---|1| saves ---|N| W
-    W ---|N| points ---|1| M
+    U --- writes --- R
+    R --- about --- M
+    U --- saves --- W
+    W --- points --- M
 
     classDef entity fill:#e7f5ff,stroke:#1c7ed6,stroke-width:2px,color:#0b2e4f
     classDef relation fill:#fff3bf,stroke:#f08c00,stroke-width:2px,color:#5c3c00
@@ -202,7 +202,7 @@ flowchart LR
 |---|---|
 | 🔑 | Primary key |
 | 🔗 | Foreign key (points to `users.id` or `movies.id`) |
-| `1 ── N` | One row on the left can have many rows on the right |
+| `1 : N` | One row on the left can have many rows on the right |
 | unique pair | `reviews (user_id, movie_id)` and `watchlist (user_id, movie_id)` |
 
 - **users → reviews / watchlist:** one user can have many reviews and many saved movies.
