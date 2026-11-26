@@ -25,4 +25,35 @@ function checkMovieQuery(req, res, next) {
   next();
 }
 
-module.exports = { checkId, checkMovieQuery };
+const EMAIL_FORMAT = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Emails are stored trimmed and in lower case, so "Anna@Test.com " = "anna@test.com"
+function cleanEmail(value) {
+  return typeof value === 'string' ? value.trim().toLowerCase() : '';
+}
+
+function checkRegister(req, res, next) {
+  const email = cleanEmail(req.body.email);
+  const { password } = req.body;
+  if (!EMAIL_FORMAT.test(email)) {
+    return next(new HttpError(400, 'Please enter a valid email address'));
+  }
+  // bcrypt only reads the first 72 bytes, so longer passwords are refused
+  if (typeof password !== 'string' || password.length < 8 || password.length > 72) {
+    return next(new HttpError(400, 'Password must be between 8 and 72 characters'));
+  }
+  req.body = { email, password };
+  next();
+}
+
+function checkLogin(req, res, next) {
+  const email = cleanEmail(req.body.email);
+  const { password } = req.body;
+  if (!email || typeof password !== 'string' || !password) {
+    return next(new HttpError(400, 'Email and password are both required'));
+  }
+  req.body = { email, password };
+  next();
+}
+
+module.exports = { checkId, checkMovieQuery, checkRegister, checkLogin };
