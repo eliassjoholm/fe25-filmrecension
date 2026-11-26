@@ -56,4 +56,21 @@ function checkLogin(req, res, next) {
   next();
 }
 
-module.exports = { checkId, checkMovieQuery, checkRegister, checkLogin };
+// Used for both creating and editing a review (PUT always sends the whole review)
+function checkReview(req, res, next) {
+  const { rating, comment } = req.body;
+  if (!Number.isInteger(rating) || rating < 1 || rating > 10) {
+    return next(new HttpError(400, 'Rating must be a whole number between 1 and 10'));
+  }
+  const text = typeof comment === 'string' ? comment.trim() : '';
+  if (!text) {
+    return next(new HttpError(400, 'Comment cannot be empty'));
+  }
+  if (text.length > 1000) {
+    return next(new HttpError(400, 'Comment is too long (max 1000 characters)'));
+  }
+  req.body = { rating, comment: text };
+  next();
+}
+
+module.exports = { checkId, checkMovieQuery, checkRegister, checkLogin, checkReview };
